@@ -1,98 +1,121 @@
 #include <iostream>
-#include<string>
-
+#include <string>
 
 using namespace std;
 
-struct Node{
-  string word;
-    Node* next;
-    Node(string val):word(val),next(nullptr){}
+struct Song {
+    string title;
+    string artist;
+    int ratings[3];
+    Song *next;
+    Song *prev;
 
+    Song(string t, string a, int r[]) : title(t), artist(a), next(nullptr), prev(nullptr) {
+    for(int i = 0; i < 3; i++) {
+    ratings[i] = r[i];
+}
+}
 };
 
-void  ekleme(Node*& head,string yenikelime){
-    Node* Node2=new Node(yenikelime);
-    if(head==nullptr){
-            head=Node2;
-    return;
-    }
-       Node* temp=head;
-       while(temp->next!=nullptr){
-            temp=temp->next;
-       }
-       temp->next=Node2;
+Song* head = nullptr;
+Song* tail = nullptr;
+Song* current = nullptr;
+
+void addSong(string title, string artist, int ratings[]) {
+    Song* newSong = new Song(title, artist, ratings);
+
+    if (head == nullptr) {
+      head = tail = current = newSong;
+} else {
+     tail->next = newSong;
+      newSong->prev = tail;
+       tail = newSong;
+}
 }
 
-void undo(Node*& head){
-
-    if(head==nullptr){
-
-        cout<<"Liste zaten bos"<< endl;
-           return;
+void moveNext() {
+    if (current != nullptr && current->next != nullptr) {
+        current = current->next;
+        cout << "\n>>> Sonraki sarkiya gecildi:"<< current->title << endl;
+    } else {
+        cout << "\nListenin sonundasin daha ileri gidilemez."<< endl;
+    }
+}
+void movePrev() {
+    if (current != nullptr && current->prev != nullptr) {
+        current = current->prev;
+        cout << "\n<<< Onceki sarkiya gecildi: " << current->title << endl;
+    } else {
+        cout << "\n!!! Listenin basindasin daha geri gidilemez." << endl;
+    }
+}
+void removeCurrent() {
+    if (current == nullptr) {
+        cout << "Silinecek sarki yok" << endl;
+        return;
+    }
+    Song* toDelete = current;
+if (toDelete->prev != nullptr) {
+        toDelete->prev->next = toDelete->next;
+} else {
+    head = toDelete->next;
+}
+    if (toDelete->next != nullptr) {
+    toDelete->next->prev = toDelete->prev;
+    current = toDelete->next;
+    } else {
+        tail = toDelete->prev;
+        current = tail;
     }
 
-
-    if(head->next==nullptr){
-            delete head;
-              head=nullptr;
-
-     return;
+    cout << "\n Silinen Sarki: " << toDelete->title << endl;
+delete toDelete;
+}
+void display() {
+  cout << "\n GUNCEL PLAYLIST " << endl;
+   if (head == nullptr) {
+     cout << "Liste bos!" << endl;
+        return;
     }
 
-      Node* temp=head;
-      while(temp->next->next!=nullptr){
-            temp=temp->next;
-      }
+       Song* temp = head;
+while (temp != nullptr) {
+        if (temp == current) {
+            cout << "->";
+        }else{
+            cout << "   ";
+        }
 
-
-      delete temp->next;
-      temp->next=nullptr;
+        cout << "[" << temp->title << "] - " << temp->artist << "|Puanlar:";
+    for (int i = 0; i < 3; i++) {
+        cout << temp->ratings[i] << (i < 2 ? ", " : "");
+        }
+        cout << endl;
+        temp=temp->next;
     }
-
-
-void display(Node* head){
-    Node* temp=head;
-    while(temp!=nullptr){
-        cout<<"[" <<temp->word <<"] ->";
-          temp=temp->next;
-    }
-    cout<<"NULL"<<endl;
-
-
+    cout<<"=====================================\n" << endl;
 }
 
+int main() {
+    int p1[] = {8, 9, 7};
+    addSong("Starboy","The Weeknd", p1);
 
+    int p2[] = {10, 8, 9};
+    addSong("Mockingbird","Eminem", p2);
 
+    int p3[] = {7, 7, 8};
+    addSong("Sweater Weather","The Neighbourhood",p3);
 
-int main()
-{
-Node* head=nullptr;
-string input;
-cout<<"(UNDO:son kelimeyi sil,EXIT:cikis)"<<endl;
-while(true){
-            cout<<"Kelime girin:";
-            cin>>input;
+    display();
 
-if(input=="EXIT"){
-        break;
-}
-else if(input == "UNDO"){
-        undo(head);
+    moveNext();
+    display();
 
-}else{
-    ekleme(head,input);
-}
-display(head);
-}
+    removeCurrent();
+    display();
 
-
-
-
-
+    movePrev();
+    display();
 
     return 0;
 }
-
-
-
