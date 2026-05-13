@@ -10,36 +10,40 @@ struct Sensor {
 };
 
 int main() {
-    long long studentID = 152120241033;
-    int N = studentID % 50;
-    int E = studentID % 100;
+    long long no;
+
+    cout << "Numara giriniz: ";
+    cin >> no;
+
+    int N = no % 50;
+    int E = no % 100;
 
     Sensor s;
-    float eskiSicaklik;
+    float ilk_deger;
 
-    fstream dosya("sensors.bin", ios::in | ios::out | ios::binary);
+    fstream f("sensors.bin", ios::in | ios::out | ios::binary);
 
-    if (!dosya) {
+    if (!f) {
         return 1;
     }
 
-    dosya.seekg(N * sizeof(Sensor), ios::beg);
-    dosya.read((char*)&s, sizeof(Sensor));
+    f.seekg(N * sizeof(Sensor), ios::beg);
+    f.read((char*)&s, sizeof(Sensor));
 
-    eskiSicaklik = s.sicaklik;
+    ilk_deger = s.sicaklik;
     s.sicaklik += E;
 
-    dosya.seekp(N * sizeof(Sensor), ios::beg);
-    dosya.write((char*)&s, sizeof(Sensor));
-    dosya.close();
+    f.seekp(N * sizeof(Sensor), ios::beg);
+    f.write((char*)&s, sizeof(Sensor));
+    f.close();
 
-    string raporAdi = to_string(studentID) + "_Quiz5.txt";
-    ofstream rapor(raporAdi);
+    string dosya_adi = to_string(no) + "_Quiz5.txt";
+    ofstream rapor(dosya_adi);
 
     if (rapor.is_open()) {
-        rapor << "Number: " << studentID << endl;
+        rapor << "Number: " << no << endl;
         rapor << "Sensor Index Used in the Process: [" << N << "]" << endl;
-        rapor << "First Temperature: [" << eskiSicaklik << "] -> New Temperature: [" << s.sicaklik << "]" << endl;
+        rapor << "First Temperature: [" << ilk_deger << "] -> New Temperature: [" << s.sicaklik << "]" << endl;
         rapor.close();
     }
 
